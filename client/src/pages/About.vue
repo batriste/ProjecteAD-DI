@@ -1,6 +1,6 @@
 <template>
   <q-page class="flex flex-center">
-    <div><br>Hola aquesta pagina es la de About</div>
+    <div>Hola aquesta pagina es la de About<br>Fet per Batiste</div>
   </q-page>
 </template>
 
