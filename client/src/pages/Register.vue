@@ -10,7 +10,7 @@
         v-model="nameComplet"
         label="Nom Complet"
         lazy-rules
-        :rules="[ val => val && val.length > 0 || 'Escriu el nom']"
+        :rules="[ validName || 'Escriu el nom']"
       >
         <q-icon name="text_format"/>
       </q-input>
@@ -20,7 +20,7 @@
         v-model="dni"
         label="DNI"
         lazy-rules
-        :rules="[ dni.error = true || 'Escriu el dni']"
+        :rules="[ isVDni || 'Escriu el dni']"
        >
         <q-icon name="credit_card"/>
       </q-input>
@@ -41,11 +41,20 @@
         v-model="password"
         label="Password"
         lazy-rules
-        :rules="[ password.error = true || 'Escriu la contrasenya']"
+        :rules="[ val => val.length >= 4|| 'Escriu la contrasenya']"
       >
         <q-icon name="password"/>
       </q-input>
-
+      <q-input
+        filled
+        type="password"
+        v-model="password2"
+        label="Password"
+        lazy-rules
+        :rules="[ val => val === this.password || 'Escriu la contrasenya']"
+      >
+        <q-icon name="password"/>
+      </q-input>
       <div>
         <q-btn label="Registrar" class="full-width" size="lg" type="submit" color="primary"/>
       </div>
@@ -54,38 +63,32 @@
   </div>
   </q-page>
 </template>
-
 <script>
 export default {
   name: 'Register',
   data () {
     return {
-      nameComplet: null,
+      nameComplet: '',
       dni: {
         error: false,
-        string: null
+        string: ''
       },
-      username: null,
-      password: {
-        error: false,
-        string: null
-      },
+      username: '',
+      password: '',
+      password2: '',
       validated: null
     }
   },
-  methods: {
-    validateForm () {
-      if (this.dni.string === '' && this.password.string === '') {
-        return false
-      }
-      this.validated = true
-      if (this.dni.string.length !== 9) {
-        this.dni.error = true
-        this.validated = false
-      } else {
-        this.dni.error = false
-      }
-      return this.validated
+  computed: {
+    isVDni () {
+      return new RegExp('[0-9](8)[A-Z]').test(this.dni)
+    },
+    validName () {
+      var nameC = this.nameComplet.split(' ')
+      return (
+        nameC.length() >= 3 &&
+        nameC.filter(this.nameC).length() === nameC.length()
+      )
     }
   }
 }
