@@ -79,7 +79,7 @@ export default {
       validated: null
     }
   },
-  computed: {
+  methods: {
     isVDni () {
       return new RegExp('[0-9](8)[A-Z]').test(this.dni)
     },
