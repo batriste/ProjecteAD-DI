@@ -4,10 +4,10 @@ class Usuario{
 
     constructor(id, username, password, full_name, avatar){
         this._id = id;
-        this._username = username;
-        this._password = password;
-        this._full_name = full_name;
-        this._avatar = avatar;
+        this.username = username;
+        this.password = password;
+        this.full_name = full_name;
+        this.avatar = avatar;
     }
 
     get id(){
@@ -19,35 +19,35 @@ class Usuario{
     }
 
     get username(){
-        return this._username;
+        return this.username;
     }
     
     set username(username){
-        this._username = username;
+        this.username = username;
     }
 
     get password(){
-        return this._password;
+        return this.password;
     }
     
     set password(password){
-        this._password = password;
+        this.password = password;
     }
 
     get full_name(){
-        return this._full_name;
+        return this.full_name;
     }
     
     set full_name(full_name){
-        this._full_name = full_name;
+        this.full_name = full_name;
     }
 
     get avatar(){
-        return this._avatar;
+        return this.avatar;
     }
     
     set avatar(avatar){
-        this._avatar = avatar;
+        this.avatar = avatar;
     }
 }
 module.exports = {
