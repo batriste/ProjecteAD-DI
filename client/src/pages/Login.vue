@@ -42,6 +42,12 @@
 
 <script>
 export default {
-  name: 'Pagina Login'
+  name: 'Pagina Login',
+  data () {
+    return {
+      name: '',
+      password: ''
+    }
+  }
 }
 </script>
