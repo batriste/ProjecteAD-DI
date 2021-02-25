@@ -53,7 +53,6 @@
       >
         <q-icon name="password"/>
       </q-input>
-
       <div>
         <q-btn label="Registrar" class="full-width" size="lg" type="submit" color="primary"/>
       </div>
@@ -62,7 +61,6 @@
   </div>
   </q-page>
 </template>
-
 <script>
 export default {
   name: 'Register',
