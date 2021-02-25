@@ -7,10 +7,10 @@
     >
       <q-input
         filled
-        v-model="nameComplet"
+        v-model="full_name"
         label="Nom Complet"
         lazy-rules
-        :rules="[ validName || 'Escriu el nom']"
+        :rules="[ val => validName || 'Escriu el nom']"
       >
         <q-icon name="text_format"/>
       </q-input>
@@ -20,11 +20,10 @@
         v-model="dni"
         label="DNI"
         lazy-rules
-        :rules="[ isVDni || 'Escriu el dni']"
+        :rules="[ val => isVDni || 'Escriu el dni']"
        >
         <q-icon name="credit_card"/>
       </q-input>
-
       <q-input
         filled
         v-model="username"
@@ -34,14 +33,13 @@
       >
         <q-icon name="perm_identity"/>
       </q-input>
-
       <q-input
         filled
         type="password"
         v-model="password"
         label="Password"
         lazy-rules
-        :rules="[ val => val.length >= 4|| 'Escriu la contrasenya']"
+        :rules="[ val => val.length >= 4 || 'Escriu la contrasenya']"
       >
         <q-icon name="password"/>
       </q-input>
@@ -51,7 +49,7 @@
         v-model="password2"
         label="Password"
         lazy-rules
-        :rules="[ val => val === this.password || 'Escriu la contrasenya']"
+        :rules="[ val => val === this.password || 'La contrasenya no coincideix']"
       >
         <q-icon name="password"/>
       </q-input>
@@ -68,23 +66,19 @@ export default {
   name: 'Register',
   data () {
     return {
-      nameComplet: '',
-      dni: {
-        error: false,
-        string: ''
-      },
+      full_name: '',
+      dni: '',
       username: '',
       password: '',
-      password2: '',
-      validated: null
+      password2: ''
     }
   },
-  methods: {
+  computed: {
     isVDni () {
       return new RegExp('[0-9](8)[A-Z]').test(this.dni)
     },
     validName () {
-      var nameC = this.nameComplet.split(' ')
+      var nameC = this.full_name.split(' ')
       return (
         nameC.length() >= 3 &&
         nameC.filter(this.nameC).length() === nameC.length()
