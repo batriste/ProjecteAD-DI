@@ -29,7 +29,7 @@ class professorService {
 
                 }
             )
-        })
+        });
     }
     isProfessor(dni) {
         return new Promise((resolve, reject) => {
@@ -54,9 +54,24 @@ class professorService {
 
                 }
             )
-        })
+        });
     }
-}
+    getProfeById(id) {
+        return new Promise((resolve, reject) => {
+            let con = this.mydb.getConnection();
+            let sql = "SELECT * FROM professor WHERE id_professor = ?";
+            con.query(sql, [id], function (err, results) {
+                if (err) {
+                    reject(err)
+
+                } else {
+                    resolve(results);
+                }
+
+            });
+        });
+    }
+}   
 
 module.exports = {
     professorService: professorService,

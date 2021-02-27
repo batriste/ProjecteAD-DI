@@ -32,7 +32,7 @@ class usuarioService {
 
                 }
             )
-        })
+        });
     }
 
     isValid(username, passwoord) {
@@ -50,7 +50,7 @@ class usuarioService {
                     res(results)//then
                 }
             })
-        })
+        });
     }
 }
 

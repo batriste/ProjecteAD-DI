@@ -37,9 +37,29 @@ const authenticateJWT = (req, res, next) => {
         res.sendStatus(401);
     }
 };
-
+const creaTokenR = (id, username, esRole, avatar) => {
+    const tokenAuth = jwtAuth.jwt.sign({
+        user_id: id,
+        username: username,
+        role: esRole
+    }, jwtAuth.accessTokenSecret, { expiresIn: '2h' });
+    const refreshToken = jwtAuth.jwt.sign({
+        user_id: profe.id_professor,
+        username: username,
+        role: esRole
+    }, jwtAuth.refreshTokenSecret);
+    jwtAuth.refreshTokens.push(refreshToken);
+    res.status(200).send({
+        ok: true,
+        data: {
+            tokenAuth: tokenAuth,
+            refreshToken: refreshToken,
+            avatar: avatar
+        }
+    });
+}
 app.post('/register', (req, res) => {
-    const {  username, password, full_name, avatar, dni  } = req.body;
+    const { username, password, full_name, avatar, dni } = req.body;
 
     var us = new usuarioService.usuarioService;
     var ps = new professorService.professorService;
@@ -47,29 +67,11 @@ app.post('/register', (req, res) => {
     us.insertUsuario(req.body).then(resultado => {
         console.log(resultado);
         if (ps.isProfessor(req.body.dni) == 1) {//comrpovem que esta o no a la taula dni
-            let profe = new Professor(resultado.id, req.body.dept);
+            let profe = new Professor(resultado, req.body.dept);
             ps.insertProfessor(profe).then(result => {
-                const tokenAuth = jwtAuth.jwt.sign({
-                    user_id:profe.id_professor,
-                    username:username,
-                    role:'profe'
-                }, jwtAuth.accessTokenSecret, {expiresIn: '2h'});
-                const refreshToken = jwtAuth.jwt.sign({
-                    user_id: profe.id_professor,
-                    username:username,
-                    role:'profe'
-                }, jwtAuth.refreshTokenSecret);  
-                jwtAuth.refreshTokens.push(refreshToken);
-                                
+                creaTokenR(profe.id_professor, username, 'profe', avatar);
                 // Token afegit
-                res.status(200).send({
-                    ok:true,
-                    data: {
-                        tokenAuth: tokenAuth,
-                        refreshToken: refreshToken,
-                        avatar: avatar
-                    }
-                });
+
             }).catch(err => {
                 res.status(401).send({
                     ok: false,
@@ -80,28 +82,8 @@ app.post('/register', (req, res) => {
             let alumne = new Alumne(resultado.id, req.body.dept);
             as.insertAlumne(alumne).then(result => {
                 // fem el token de alumne abans de enviarlo
-                const tokenAuth = jwtAuth.jwt.sign({
-                    user_id:alumne.id_alumne,
-                    username:username,
-                    role:'alumne'
-                }, jwtAuth.accessTokenSecret, {expiresIn: '2h'});
-                const refreshToken = jwtAuth.jwt.sign({
-                    user_id: alumne.id_alumne,
-                    username:username,
-                    role:'alumne'
-                }, jwtAuth.refreshTokenSecret);
-                jwtAuth.refreshTokens.push(refreshToken);
-                                
-                //  Token afegit
-                res.status(200).send({
-                    ok:true,
-                    data: {
-                        tokenAuth: tokenAuth,
-                        refreshToken: refreshToken,
-                        avatar: avatar
-                    }
-                });
-                
+                creaTokenR(alumne, username, 'alumne', avatar);
+
             }).catch(err => {
                 res.status(401).send({
                     ok: false,
@@ -117,14 +99,51 @@ app.post('/register', (req, res) => {
     });
 
 })
-
+const creaTokenL = (id, username, esRole) => {
+    const tokenAuth = jwtAuth.jwt.sign({
+        user_id: id,
+        username: username,
+        role: esRole
+    }, jwtAuth.accessTokenSecret, { expiresIn: '2h' });
+    const refreshToken = jwtAuth.jwt.sign({
+        user_id: profe.id_professor,
+        username: username,
+        role: esRole
+    }, jwtAuth.refreshTokenSecret);
+    jwtAuth.refreshTokens.push(refreshToken);
+    res.status(200).send({
+        ok: true,
+        data: {
+            tokenAuth: tokenAuth,
+            refreshToken: refreshToken,
+        }
+    });
+}
 app.post('/login', (req, res) => {
     const { username, password } = req.body;
     var us = new usuarioService.usuarioService;
+    var ps = new professorService.professorService;
+    
     us.isValid(username, password).then(result => {
-        res.status(200).send({ ok: true, resultado: resultado });//coomprovar que va i no tenim que retornar una posicio concreta del row
+        //comprovem si es profesor
+        ps.getProfeById(result.id)
+            .then(usuari => {
+                if (result.length() == 0) {
+                    var esProfe = 'alumne';
+                } else {
+                    var esProfe = 'profe';
+                }
+                creaTokenL(usuari, username, esProfe, avatar);
+            })
+            .catch( err => {
+                res.status(402).send({
+                    ok: false,
+                    error: err
+                });
+            });
+
     }).catch(res => {
-        res.status(401).send({
+        res.status(401).send({//El login es incorrecte
             ok: false,
             error: err
         })
