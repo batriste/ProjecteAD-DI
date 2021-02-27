@@ -10,7 +10,7 @@ const jwt = require('jsonwebtoken');
 const fs = require('fs');
 const https = require('https');
 //Si toquem el port tenim que tocar el archiu ./../client/src/boot/axios.js
-const PORT = 1234;
+const PORT = 6969;
 let app = express();
 app.use(bodyParser.json());
 https.createServer({
@@ -39,7 +39,7 @@ const authenticateJWT = (req, res, next) => {
 };
 
 app.post('/register', (req, res) => {
-    const { dni, usuario, nombreCompleto, avatar, password } = req.body;
+    const {  username, password, full_name, avatar, dni  } = req.body;
 
     var us = new usuarioService.usuarioService;
     var ps = new professorService.professorService;
@@ -49,8 +49,28 @@ app.post('/register', (req, res) => {
         if (ps.isProfessor(req.body.dni) == 1) {//comrpovem que esta o no a la taula dni
             let profe = new Professor(resultado.id, req.body.dept);
             ps.insertProfessor(profe).then(result => {
-                res.status(200).send({ ok: true, resultado: resultado });
-            }).catch(result => {
+                const tokenAuth = jwtAuth.jwt.sign({
+                    user_id:profe.id_professor,
+                    username:username,
+                    role:'profe'
+                }, jwtAuth.accessTokenSecret, {expiresIn: '2h'});
+                const refreshToken = jwtAuth.jwt.sign({
+                    user_id: profe.id_professor,
+                    username:username,
+                    role:'profe'
+                }, jwtAuth.refreshTokenSecret);  
+                jwtAuth.refreshTokens.push(refreshToken);
+                                
+                // Token afegit
+                res.status(200).send({
+                    ok:true,
+                    data: {
+                        tokenAuth: tokenAuth,
+                        refreshToken: refreshToken,
+                        avatar: avatar
+                    }
+                });
+            }).catch(err => {
                 res.status(401).send({
                     ok: false,
                     error: "Error inserint profesor" + err
@@ -59,16 +79,37 @@ app.post('/register', (req, res) => {
         } else {//inserim alumne
             let alumne = new Alumne(resultado.id, req.body.dept);
             as.insertAlumne(alumne).then(result => {
-                res.status(200).send({ ok: true, resultado: resultado });//faltaria afegir el token
-            }).catch(result => {
+                // fem el token de alumne abans de enviarlo
+                const tokenAuth = jwtAuth.jwt.sign({
+                    user_id:alumne.id_alumne,
+                    username:username,
+                    role:'alumne'
+                }, jwtAuth.accessTokenSecret, {expiresIn: '2h'});
+                const refreshToken = jwtAuth.jwt.sign({
+                    user_id: alumne.id_alumne,
+                    username:username,
+                    role:'alumne'
+                }, jwtAuth.refreshTokenSecret);
+                jwtAuth.refreshTokens.push(refreshToken);
+                                
+                //  Token afegit
+                res.status(200).send({
+                    ok:true,
+                    data: {
+                        tokenAuth: tokenAuth,
+                        refreshToken: refreshToken,
+                        avatar: avatar
+                    }
+                });
+                
+            }).catch(err => {
                 res.status(401).send({
                     ok: false,
                     error: "Error inserint alumne" + err
                 })
             });
         }
-
-    }).catch(res => {
+    }).catch(err => {
         res.status(401).send({
             ok: false,
             error: "Error inserint dades" + err

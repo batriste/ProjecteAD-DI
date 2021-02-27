@@ -1,9 +1,10 @@
-const db = require('../db/database');
-const alumne = require('../bean/Alumne');
+const db = require('./../db/database');
+const alumne = require('./../bean/Alumne');
 class alumneService {
 
     constructor() { }
     insertAlumne(Alumne) {
+        return new Promise((resolve, reject) => {
         let conn = this.db.getConnection();
         let sql =
             "INSERT INTO alumne (id_alumne, repetidor, curs) VALUES (?, ?, ?)";
@@ -17,17 +18,17 @@ class alumneService {
             ],
             function (err, results) {
 
-                return new Promise((resolve, reject) => {
+                
 
                     if (err) {
                         reject(err)
                     } else {
                         resolve(results)
                     }
-                })
+               
             }
         )
-
+        })
     }
 }
 
