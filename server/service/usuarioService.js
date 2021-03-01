@@ -25,9 +25,9 @@ class usuarioService {
 
 
                     if (err) {
-                        rej(err)//catch
+                        rej(err);//catch
                     } else {
-                        res(results)//then
+                        res(results);//then
                     }
 
                 }
@@ -45,9 +45,9 @@ class usuarioService {
 
 
                 if (err) {
-                    rej(err)//catch
+                    rej(err);//catch
                 } else {
-                    res(results)//then
+                    res(results);//then
                 }
             })
         });

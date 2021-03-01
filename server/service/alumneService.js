@@ -21,9 +21,9 @@ class alumneService {
                 
 
                     if (err) {
-                        reject(err)
+                        reject(err);
                     } else {
-                        resolve(results)
+                        resolve(results);
                     }
                
             }

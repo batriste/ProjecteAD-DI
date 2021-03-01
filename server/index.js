@@ -181,3 +181,52 @@ app.get("/notes", authenticateJWT, (req, res) => {
 
 
 });
+app.get("/notes", authenticateJWT, (req, res) => {
+    const { id, dni } = req.body;
+    var ps = new professorService.professorService;
+    var ns = new notesService.noteService;
+    ps.isProfessor(dni).then(err => {
+        res.status(401).send({//El login es incorrecte
+            ok: false,
+            error: "Es Profesor"
+        })
+    }).catch(resu => {
+        ns.getNotes(id).then(result => {
+            res.status(201).send({
+                result,
+              });
+        }).catch(erroret => {
+            res.status(401).send({//El login es incorrecte
+                ok: false,
+                error: "Error al buscar notes"
+            })
+        })
+    });
+
+
+});
+app.get("/notes:id_Assig", authenticateJWT, (req, res) => {
+    const { id, dni} = req.body;
+    var id_assig = req.header.id_Assig;
+    var ps = new professorService.professorService;
+    var ns = new notesService.noteService;
+    ps.isProfessor(dni).then(err => {
+        res.status(401).send({//El login es incorrecte
+            ok: false,
+            error: "Es Profesor"
+        })
+    }).catch(resu => {
+        ns.getNotesByID(id).then(result => {
+            res.status(201).send({
+                result,
+              });
+        }).catch(erroret => {
+            res.status(401).send({//El login es incorrecte
+                ok: false,
+                error: "Error al buscar notes"
+            });
+        })
+    });
+});
+
+

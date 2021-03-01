@@ -22,9 +22,9 @@ class professorService {
 
 
                     if (err) {
-                        reject(err)
+                        reject(err);
                     } else {
-                        resolve(results)
+                        resolve(results);
                     }
 
                 }
@@ -47,9 +47,9 @@ class professorService {
 
 
                     if (err) {
-                        reject(err)
+                        reject(err);
                     } else {
-                        resolve(results)
+                        resolve(results);
                     }
 
                 }
@@ -62,7 +62,7 @@ class professorService {
             let sql = "SELECT * FROM professor WHERE id_professor = ?";
             con.query(sql, [id], function (err, results) {
                 if (err) {
-                    reject(err)
+                    reject(err);
 
                 } else {
                     resolve(results);
