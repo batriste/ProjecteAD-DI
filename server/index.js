@@ -2,6 +2,7 @@ const express = require('express');
 const usuarioService = require('./service/usuarioService')
 const alumneService = require('./service/alumneService')
 const professorService = require('./service/professorService')
+const notesService = require('./service/noteService')
 const Professor = require('./bean/Professor');
 const Alumne = require('./bean/Alumne');
 const bodyParser = require('body-parser');
@@ -66,19 +67,24 @@ app.post('/register', (req, res) => {
     var as = new alumneService.alumneService;
     us.insertUsuario(req.body).then(resultado => {
         console.log(resultado);
-        if (ps.isProfessor(req.body.dni) == 1) {//comrpovem que esta o no a la taula dni
-            let profe = new Professor(resultado, req.body.dept);
-            ps.insertProfessor(profe).then(result => {
-                creaTokenR(profe.id_professor, username, 'profe', avatar);
-                // Token afegit
+        ps.isProfessor(req.body.dni).then(resu => {
+            //comrpovem que esta o no a la taula dni
+            if (resu.length() == 1) {
+                let profe = new Professor(resultado, req.body.dept);
+                ps.insertProfessor(profe).then(result => {
+                    creaTokenR(profe.id_professor, username, 'profe', avatar);
+                    // Token afegit
 
-            }).catch(err => {
-                res.status(401).send({
-                    ok: false,
-                    error: "Error inserint profesor" + err
-                })
-            });
-        } else {//inserim alumne
+                }).catch(err => {
+                    res.status(401).send({
+                        ok: false,
+                        error: "Error inserint profesor" + err
+                    })
+                });
+            }
+        }
+        ).catch(arreu => {
+            //inserim alumne
             let alumne = new Alumne(resultado.id, req.body.dept);
             as.insertAlumne(alumne).then(result => {
                 // fem el token de alumne abans de enviarlo
@@ -90,7 +96,9 @@ app.post('/register', (req, res) => {
                     error: "Error inserint alumne" + err
                 })
             });
-        }
+
+        });
+
     }).catch(err => {
         res.status(401).send({
             ok: false,
@@ -123,7 +131,7 @@ app.post('/login', (req, res) => {
     const { username, password } = req.body;
     var us = new usuarioService.usuarioService;
     var ps = new professorService.professorService;
-    
+
     us.isValid(username, password).then(result => {
         //comprovem si es profesor
         ps.getProfeById(result.id)
@@ -135,7 +143,7 @@ app.post('/login', (req, res) => {
                 }
                 creaTokenL(usuari, username, esProfe, avatar);
             })
-            .catch( err => {
+            .catch(err => {
                 res.status(402).send({
                     ok: false,
                     error: err
@@ -149,3 +157,27 @@ app.post('/login', (req, res) => {
         })
     });
 })
+app.get("/notes", authenticateJWT, (req, res) => {
+    const { id, dni } = req.body;
+    var ps = new professorService.professorService;
+    var ns = new notesService.noteService;
+    ps.isProfessor(dni).then(err => {
+        res.status(401).send({//El login es incorrecte
+            ok: false,
+            error: "Es Profesor"
+        })
+    }).catch(resu => {
+        msContentScript.getNotes(id).then(result => {
+            res.status(201).send({
+                result,
+              });
+        }).catch(erroret => {
+            res.status(401).send({//El login es incorrecte
+                ok: false,
+                error: "Error al buscar notes"
+            })
+        })
+    });
+
+
+});
