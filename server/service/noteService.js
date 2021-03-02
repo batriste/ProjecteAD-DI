@@ -10,7 +10,7 @@ class noteService {
                 "SELECT notes.nota, notes.id_assig, assignatura.cod_assig, assignatura.nom_assig " +
                 "FROM notes, assignatura " +
                 "WHERE notes.id_alumne = ? AND notes.id_assig = assignatura.id_assig" +
-                "ORDER BY n.id_assig";
+                "ORDER BY notes.id_assig";
 
             conn.query(
                 sql,
@@ -49,8 +49,7 @@ class noteService {
             let sql =
                 "SELECT notes.nota, notes.id_assig, assignatura.cod_assig, assignatura.nom_assig " +
                 "FROM notes, assignatura " +
-                "WHERE notes.id_alumne = ? AND notes.id_assig = assignatura.id_assig AND notes.id_assig = ?" +
-                "ORDER BY n.id_assig";
+                "WHERE notes.id_alumne = ? AND notes.id_assig = assignatura.id_assig AND notes.id_assig = ?";
 
             conn.query(
                 sql,
@@ -86,7 +85,7 @@ class noteService {
                     }
 
                 }
-            )
+            );
         });
     }
 }

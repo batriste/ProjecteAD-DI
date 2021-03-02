@@ -58,7 +58,7 @@ const creaTokenR = (id, username, esRole, avatar) => {
             avatar: avatar
         }
     });
-}
+};
 app.post('/register', (req, res) => {
     const { username, password, full_name, avatar, dni } = req.body;
 
@@ -79,7 +79,7 @@ app.post('/register', (req, res) => {
                     res.status(401).send({
                         ok: false,
                         error: "Error inserint profesor" + err
-                    })
+                    });
                 });
             }
         }
@@ -94,7 +94,7 @@ app.post('/register', (req, res) => {
                 res.status(401).send({
                     ok: false,
                     error: "Error inserint alumne" + err
-                })
+                });
             });
 
         });
@@ -103,7 +103,7 @@ app.post('/register', (req, res) => {
         res.status(401).send({
             ok: false,
             error: "Error inserint dades" + err
-        })
+        });
     });
 
 })
@@ -126,7 +126,7 @@ const creaTokenL = (id, username, esRole) => {
             refreshToken: refreshToken,
         }
     });
-}
+};
 app.post('/login', (req, res) => {
     const { username, password } = req.body;
     var us = new usuarioService.usuarioService;
@@ -154,7 +154,7 @@ app.post('/login', (req, res) => {
         res.status(401).send({//El login es incorrecte
             ok: false,
             error: err
-        })
+        });
     });
 })
 app.get("/notes", authenticateJWT, (req, res) => {
@@ -165,22 +165,22 @@ app.get("/notes", authenticateJWT, (req, res) => {
         res.status(401).send({//El login es incorrecte
             ok: false,
             error: "Es Profesor"
-        })
+        });
     }).catch(resu => {
         msContentScript.getNotes(id).then(result => {
             res.status(201).send({
                 result,
-              });
+            });
         }).catch(erroret => {
             res.status(401).send({//El login es incorrecte
                 ok: false,
                 error: "Error al buscar notes"
-            })
-        })
+            });
+        });
     });
 
 
-});
+})
 app.get("/notes", authenticateJWT, (req, res) => {
     const { id, dni } = req.body;
     var ps = new professorService.professorService;
@@ -189,24 +189,24 @@ app.get("/notes", authenticateJWT, (req, res) => {
         res.status(401).send({//El login es incorrecte
             ok: false,
             error: "Es Profesor"
-        })
+        });
     }).catch(resu => {
         ns.getNotes(id).then(result => {
             res.status(201).send({
-                result,
-              });
+                result
+            });
         }).catch(erroret => {
             res.status(401).send({//El login es incorrecte
                 ok: false,
                 error: "Error al buscar notes"
-            })
-        })
+            });
+        });
     });
 
 
-});
+})
 app.get("/notes:id_Assig", authenticateJWT, (req, res) => {
-    const { id, dni} = req.body;
+    const { id, dni } = req.body;
     var id_assig = req.header.id_Assig;
     var ps = new professorService.professorService;
     var ns = new notesService.noteService;
@@ -218,15 +218,65 @@ app.get("/notes:id_Assig", authenticateJWT, (req, res) => {
     }).catch(resu => {
         ns.getNotesByID(id).then(result => {
             res.status(201).send({
-                result,
-              });
+                result
+            });
         }).catch(erroret => {
             res.status(401).send({//El login es incorrecte
                 ok: false,
                 error: "Error al buscar notes"
             });
-        })
+        });
     });
-});
+})
 
+app.get("/moduls", authenticateJWT, (req, res) => {
+    const { id, dni } = req.body;
 
+    var ps = new professorService.professorService;
+    var ms = new modulService.modulService;
+    ps.isProfessor(dni).then(err => {
+
+        ms.getModuls(id).then(result => {
+            res.status(201).send({
+                result
+            });
+        }).catch(erroret => {
+            res.status(401).send({//El login es incorrecte
+                ok: false,
+                error: "Error al buscar moduls"
+            });
+        });
+    }).catch(resu => {
+        res.status(401).send({//El login es incorrecte
+            ok: false,
+            error: "Es alumne"
+        });
+    });
+})
+
+app.get("/moduls:id_Assig", authenticateJWT, (req, res) => {
+
+    var id_assig = req.header.id_Assig;
+    const { id, dni } = req.body;
+
+    var ps = new professorService.professorService;
+    var ms = new modulService.modulService;
+    ps.isProfessor(dni).then(err => {
+
+        ms.getModulsByID(id).then(result => {
+            res.status(201).send({
+                result
+            });
+        }).catch(erroret => {
+            res.status(401).send({//El login es incorrecte
+                ok: false,
+                error: "Error al buscar moduls"
+            });
+        });
+    }).catch(resu => {
+        res.status(401).send({//El login es incorrecte
+            ok: false,
+            error: "Es alumne"
+        });
+    });
+})
