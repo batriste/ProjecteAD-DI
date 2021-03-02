@@ -53,6 +53,7 @@ const creaTokenR = (id, username, esRole, avatar) => {
     res.status(200).send({
         ok: true,
         data: {
+
             tokenAuth: tokenAuth,
             refreshToken: refreshToken,
             avatar: avatar
@@ -70,7 +71,7 @@ app.post('/register', (req, res) => {
         ps.isProfessor(req.body.dni).then(resu => {
             //comrpovem que esta o no a la taula dni
             if (resu.length() == 1) {
-                let profe = new Professor(resultado, req.body.dept);
+                let profe = new Professor.Professor(resultado.id, req.body.dept);//error solventat si falla llevar el .Professor
                 ps.insertProfessor(profe).then(result => {
                     creaTokenR(profe.id_professor, username, 'profe', avatar);
                     // Token afegit
@@ -85,7 +86,7 @@ app.post('/register', (req, res) => {
         }
         ).catch(arreu => {
             //inserim alumne
-            let alumne = new Alumne(resultado.id, req.body.dept);
+            let alumne = new Alumne.Alumne(resultado.id, req.body.repetidor, req.body.curs);
             as.insertAlumne(alumne).then(result => {
                 // fem el token de alumne abans de enviarlo
                 creaTokenR(alumne, username, 'alumne', avatar);
@@ -102,7 +103,7 @@ app.post('/register', (req, res) => {
     }).catch(err => {
         res.status(401).send({
             ok: false,
-            error: "Error inserint dades" + err
+            error: "Error inserint dades en general" + err
         });
     });
 
@@ -167,7 +168,7 @@ app.get("/notes", authenticateJWT, (req, res) => {
             error: "Es Profesor"
         });
     }).catch(resu => {
-        msContentScript.getNotes(id).then(result => {
+        ns.getNotes(id).then(result => {
             res.status(201).send({
                 result,
             });
@@ -181,33 +182,10 @@ app.get("/notes", authenticateJWT, (req, res) => {
 
 
 })
-app.get("/notes", authenticateJWT, (req, res) => {
-    const { id, dni } = req.body;
-    var ps = new professorService.professorService;
-    var ns = new notesService.noteService;
-    ps.isProfessor(dni).then(err => {
-        res.status(401).send({//El login es incorrecte
-            ok: false,
-            error: "Es Profesor"
-        });
-    }).catch(resu => {
-        ns.getNotes(id).then(result => {
-            res.status(201).send({
-                result
-            });
-        }).catch(erroret => {
-            res.status(401).send({//El login es incorrecte
-                ok: false,
-                error: "Error al buscar notes"
-            });
-        });
-    });
 
-
-})
-app.get("/notes:id_Assig", authenticateJWT, (req, res) => {
+app.get("/notes/:id_Assig", authenticateJWT, (req, res) => {
     const { id, dni } = req.body;
-    var id_assig = req.header.id_Assig;
+    const id_assig = req.header.id_Assig;
     var ps = new professorService.professorService;
     var ns = new notesService.noteService;
     ps.isProfessor(dni).then(err => {
@@ -216,7 +194,7 @@ app.get("/notes:id_Assig", authenticateJWT, (req, res) => {
             error: "Es Profesor"
         })
     }).catch(resu => {
-        ns.getNotesByID(id).then(result => {
+        ns.getNotesByID(id, id_assig).then(result => {
             res.status(201).send({
                 result
             });
@@ -254,16 +232,16 @@ app.get("/moduls", authenticateJWT, (req, res) => {
     });
 })
 
-app.get("/moduls:id_Assig", authenticateJWT, (req, res) => {
+app.get("/moduls/:id_Assig", authenticateJWT, (req, res) => {
 
-    var id_assig = req.header.id_Assig;
+    const id_assig = req.header.id_Assig;
     const { id, dni } = req.body;
 
     var ps = new professorService.professorService;
     var ms = new modulService.modulService;
     ps.isProfessor(dni).then(err => {
 
-        ms.getModulsByID(id).then(result => {
+        ms.getModulsByID(id, id_assig).then(result => {
             res.status(201).send({
                 result
             });
@@ -274,6 +252,31 @@ app.get("/moduls:id_Assig", authenticateJWT, (req, res) => {
             });
         });
     }).catch(resu => {
+        res.status(401).send({//El login es incorrecte
+            ok: false,
+            error: "Es alumne"
+        });
+    });
+})
+app.put("/moduls/:id_Assig/:id_alumne", authenticateJWT, (req, res) => {
+    const id_alumne = req.header.id_alumne;
+    const id_assig = req.header.id_Assig;
+    const { nota, dni, id_professor } = req.body;
+    var ps = new professorService.professorService;
+    var ns = new notesService.noteService;
+    ps.isProfessor(dni).then(resu => {
+        ms.setNota(nota, id_professor, id_alumne, id_assig).
+            then(result => {
+                res.status(201).send({
+                    ok: true
+                });
+            }).catch(err => {
+                res.status(401).send({//El login es incorrecte
+                    ok: false,
+                    error: "No se ha pogut inserir la nota"
+                });
+            });
+    }).catch(err => {
         res.status(401).send({//El login es incorrecte
             ok: false,
             error: "Es alumne"

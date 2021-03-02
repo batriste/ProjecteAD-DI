@@ -35,7 +35,7 @@ class professorService {
         return new Promise((resolve, reject) => {
             let conn = this.db.getConnection();
             let sql =
-                "SELECT count(dni) FROM dni_profe WHERE dni = ?";
+                "SELECT dni FROM dni_profe WHERE dni = ?";
 
             conn.query(
                 sql,

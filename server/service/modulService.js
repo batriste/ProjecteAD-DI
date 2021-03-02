@@ -20,9 +20,9 @@ class modulService {
                     if (err) {
                         reject(err);
                     } else {
-                        var notesArr = [];
+                        var modulArr = [];
                         results.array.forEach(element => {
-                            notesArr.push({
+                            modulArr.push({
                                 id_assig: element.id_assig,
                                 cod_assig: element.cod_assig,
                                 nom_assig: element.nom_assig,
@@ -31,7 +31,7 @@ class modulService {
                                 hores: element.hores
                             });
                         });
-                        resolve(notesArr);
+                        resolve(modulArr);
                     }
 
                 }
@@ -57,14 +57,23 @@ class modulService {
                     } else {
                         var modulArr = [];
                         results.array.forEach(element => {
-                            element.links = {
-                                assig:"GET "+url+"/assignatura/"+element.id_assig,
-                                alumne: "GET "+url+"/alumne/"+element.id_alumne
-                                //,nota: "PUT "+url+"/moduls/"+element.id_assig+"/"+element.id_alumne
-                            }
+                            modulArr.push({
+                                id_assig: element.id_assig,
+                                cod_assig: element.cod_assig,
+                                nom_assig: element.nom_assig,
+                                modul: element.modul,
+                                curs: element.curs,
+                                hores: element.hores,
+                                links: {
+                                    assig:"GET "+url+"/assignatura/"+element.id_assig,
+                                    alumne: "GET "+url+"/alumne/"+element.id_alumne
+                                    //,nota: "PUT "+url+"/moduls/"+element.id_assig+"/"+element.id_alumne
+                                }
+                            });
+                           
                             modulArr.push(element);
                         });
-                        resolve(notesArr);
+                        resolve(modulArr);
                     }
 
                 }
@@ -72,6 +81,7 @@ class modulService {
         });
 
     }
+    
 }
 
 module.exports = {

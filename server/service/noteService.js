@@ -88,6 +88,25 @@ class noteService {
             );
         });
     }
+    setNota(nota, id_professor, id_alumne, id_assig) {
+        return new Promise((resolve, reject) => {
+            let conn = this.db.getConnection();
+            let sql = "UPDATE notes SET nota=? WHERE id_alumne = ? AND id_profe = ? AND id_assig = ?"
+            conn.query(
+                sql,
+                [
+                    id,
+                    id_assig
+                ],
+                function (err, results) {
+                    if (err) {
+                        reject(err);
+                    } else {
+                        resolve(results);
+                    }
+                });
+        });
+    }
 }
 
 module.exports = {
